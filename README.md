@@ -1,7 +1,7 @@
 # Java_Console_Multichat
 
 ## Requirements
-- Java
+- Java 9+
 
 ## Build
 
