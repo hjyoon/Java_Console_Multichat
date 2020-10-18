@@ -1,21 +1,12 @@
+package me.hjyoon.multichat;
+
 import java.io.*;
-import java.math.*;
 import java.util.*;
-import java.util.regex.*;
-import java.text.*;
 import java.net.*;
-import java.net.http.*;
-import java.time.*;
-import java.time.format.*;
-import java.time.temporal.*;
 
-class Util {
-    static public String time_now() {
-        return "("+LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss"))+")";
-    }
-}
+import me.hjyoon.multichat.*;
 
-class MyServerThread extends Thread {
+public class MyServerThread extends Thread {
     private Socket clientSocket;
     private ArrayList<Socket> al;
     private String nickname;
@@ -98,75 +89,5 @@ class MyServerThread extends Thread {
             al.remove(clientSocket);
             broadcast(Util.time_now()+" "+disconnect_message());
         }
-    }
-}
-
-class MySocketServer {
-    private ServerSocket serverSocket;      // 서버 소켓
-    private BufferedReader br_from_socket;  // 소켓으로부터 전달받은 메시지를 읽어들이기 위함
-    private PrintWriter pw;                 // 클라이언트로 메시지를 보냄
-    private int port;
-    private ArrayList<Socket> al;
-
-    public MySocketServer(int port) {
-        this.port = port;
-    }
-
-    public void init() {
-        al = new ArrayList<>();
-        try {
-            serverSocket = new ServerSocket(port); // 현재 아이피로 8981포트를 사용하여 서버 오픈
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void run() {
-        try {
-            System.out.println("Server address is "+serverSocket.getInetAddress().getLocalHost().getHostAddress());
-            System.out.println("Server port is "+serverSocket.getLocalPort());
-            System.out.println(Util.time_now()+" Server is ready");
-
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                al.add(clientSocket);
-
-                BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                String nickname = br.readLine();
-
-                MyServerThread server_thread = new MyServerThread(clientSocket, al, nickname);
-                server_thread.start();
-            }
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-}
-
-public class Main {
-    private final static String DEFAULT_PORT_NUMBER = "8981";
-
-    public static void main(String args[]) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int port = -1;
-
-        try {
-            System.out.print("set port number["+DEFAULT_PORT_NUMBER+"] : ");
-            String port_tmp = br.readLine();
-            if(port_tmp.equals("")) {
-                port_tmp = DEFAULT_PORT_NUMBER;
-            }
-            port = Integer.parseInt(port_tmp);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        MySocketServer mss = new MySocketServer(port);
-        mss.init();
-        mss.run();
     }
 }
